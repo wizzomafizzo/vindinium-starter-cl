@@ -3,11 +3,24 @@ vindinium-starter-cl
 
 Common Lisp starter bot for Vindinium (http://vindinium.org)
 
-(load "~/quicklisp/setup.lisp")
-(ql:quickload 'drakma)
-(ql:quickload 'jsown)
-(ql:quickload 'cl-ppcre)
-(in-package :vindinium)
-(setq +secret-key+ "abdcdefg")
-(run-game #'my-bot :mode 'training :turns 30)
-(run-game #'my-bot :mode 'arena)
+# Dependencies
+
+* [Drakma](http://weitz.de/drakma/)
+* [jsown](https://github.com/madnificent/jsown)
+* [CL-PPCRE](http://weitz.de/cl-ppcre/)
+
+CL-PPCRE is only used for the example board/tile functions, not the client.
+
+# Usage
+
+Example session on the REPL using [Quicklisp](http://www.quicklisp.org/):
+```
+> (load "~/quicklisp/setup.lisp")
+> (ql:quickload 'drakma)
+> (ql:quickload 'jsown)
+> (ql:quickload 'cl-ppcre)
+> (in-package :vindinium)
+> (setq +secret-key+ "abdcdefg")
+> (run-game #'my-bot :mode 'training :turns 30)
+> (run-game #'my-bot :mode 'arena)
+```
