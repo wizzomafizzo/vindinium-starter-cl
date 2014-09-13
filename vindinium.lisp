@@ -143,10 +143,16 @@
 		   when (cl-ppcre:scan (car x) tile-string)
 		   collect x)))
 
-(defun at-tile (board-map x y)
+(defun tile-at (board-map x y)
   "From a board map, lookup tile at given coords and return parsed tile symbol."
   (if (array-in-bounds-p board-map y x)
 	  (parse-tile (aref board-map y x))))
+
+;; NOTE: x and y swap places
+(defun my-location (game)
+  "Get your hero's current location."
+  (let ((position (jsown:val (jsown:val game "hero") "pos")))
+	(list (jsown:val position "y") (jsown:val position "x"))))
 
 ;;; bot
 ;;; simple example bot, just moves randomly each turn
