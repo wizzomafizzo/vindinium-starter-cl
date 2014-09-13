@@ -20,7 +20,7 @@ Example session on the REPL using [Quicklisp](http://www.quicklisp.org/):
 > (ql:quickload 'jsown)
 > (ql:quickload 'cl-ppcre)
 > (in-package :vindinium)
-> (setq +secret-key+ "abdcdefg")
+> (setq +secret-key+ "abcdefgh")
 > (run-game #'my-bot :mode 'training :turns 30)
 > (run-game #'my-bot :mode 'arena)
 ```

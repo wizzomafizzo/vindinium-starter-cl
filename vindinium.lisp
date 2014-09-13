@@ -18,7 +18,7 @@
 (setq drakma:*text-content-types*
 	  (cons '("application" . "json") drakma:*text-content-types*))
 
-(defvar +secret-key+ nil) ; NOTE: set this!
+(defvar +secret-key+ nil)
 (defvar +server-url+ "http://vindinium.org")
 
 (defvar +training-url+ (format nil "~a/api/training" +server-url+))
@@ -94,13 +94,15 @@
 
 (defun run-game (bot-f &key (mode 'training) (turns 300) (map "m1"))
   "Start a new game session and loop until complete. Use bot-f to compute command."
-  (let ((game (if (eq mode 'arena)
-				  (start-arena)
-				  (start-training turns map))))
-	(loop until (game-finished? game)
-	   do (setq game (next-turn game (funcall bot-f game))))
-	(format t "~%Finished game")
-	game))
+  (if +secret-key+
+	  (let ((game (if (eq mode 'arena)
+					  (start-arena)
+					  (start-training turns map))))
+		(loop until (game-finished? game)
+		   do (setq game (next-turn game (funcall bot-f game))))
+		(format t "~%Finished game")
+		game)
+	  (format t "No secret key is set")))
 
 ;;; board/tiles handling
 
