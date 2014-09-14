@@ -113,7 +113,7 @@
 	("##" . wall)
 	("\\[\\]" . tavern)
 	("@[1234]" . hero)
-	("$[1234-]" . mine)))
+	("\\$[1234-]" . mine)))
 
 ;; (split-seq-n (a b c d) 2) => ((a b) (c d))
 (defun split-seq-n (seq n)
