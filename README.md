@@ -19,6 +19,7 @@ Example session on the REPL using [Quicklisp](http://www.quicklisp.org/):
 > (ql:quickload 'drakma)
 > (ql:quickload 'jsown)
 > (ql:quickload 'cl-ppcre)
+> (load "vindinium.lisp")
 > (in-package :vindinium)
 > (setq +secret-key+ "abcdefgh")
 > (run-game #'my-bot :mode 'training :turns 30)
