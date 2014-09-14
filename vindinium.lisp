@@ -21,9 +21,6 @@
 (defvar +secret-key+ nil)
 (defvar +server-url+ "http://vindinium.org")
 
-(defvar +training-url+ (format nil "~a/api/training" +server-url+))
-(defvar +arena-url+ (format nil "~a/api/arena" +server-url+))
-
 ;; internal command symbol -> server formatted command
 (defvar +command-map+
   '((stay . "Stay")
@@ -40,9 +37,16 @@
   "Return list of available command symbols."
   (loop for x in +command-map+ collect (car x)))
 
+(defun mode-url (mode)
+  "Create API URL for training/arena mode."
+  (if (eq mode 'arena)
+	  (format nil "~a/api/arena" +server-url+)
+	  (format nil "~a/api/training" +server-url+)))
+
 (defun do-request (url params)
   "Make a POST request with supplied parameters, return jsown object on success."
-  (let* ((response (multiple-value-list (drakma:http-request url :method :post
+  (let* ((response (multiple-value-list (drakma:http-request url
+															 :method :post
 															 :parameters params)))
 		 (body (car response))
 		 (status (cadr response)))
@@ -66,14 +70,14 @@
 
 (defun start-training (turns map)
   "Start a new training mode session and return game object."
-  (let ((game (do-request +training-url+ (make-start-args turns map))))
+  (let ((game (do-request (mode-url 'training) (make-start-args turns map))))
 	(if game (format t "Started training game: ~a~%" (view-url game)))
 	game))
 
 (defun start-arena ()
   "Start a new arena mode session and return game object."
   (format t "Waiting for pairing...~%")
-  (let ((game (do-request +arena-url+ (make-start-args 300 "m1")))) ; TODO: don't send turns/map
+  (let ((game (do-request (mode-url 'arena) (make-start-args 300 "m1")))) ; TODO: don't send turns/map
 	(if game (format t "Started arena game: ~a~%" (view-url game)))
 	game))
 
@@ -122,13 +126,20 @@
 	  (cons (subseq seq 0 n)
 			(split-seq-n (subseq seq n) n))))
 
+(defun get-in (json &rest keys)
+  "Deep select key in jsown object."
+  (let ((cur (jsown:val json (car keys))))
+	(loop for k in (cdr keys)
+	   do (setq cur (jsown:val cur k)))
+	cur))
+
 (defun board-tiles (game)
   "Return board tiles string from game object."
-  (jsown:val (jsown:val (jsown:val game "game") "board") "tiles"))
+  (get-in game "game" "board" "tiles"))
 
 (defun board-size (game)
   "Return board size from game object."
-  (jsown:val (jsown:val (jsown:val game "game") "board") "size"))
+  (get-in game "game" "board" "size"))
 
 (defun make-board-map (game)
   "Create a 2d array of the tiles string from game object."
@@ -143,15 +154,18 @@
 		   when (cl-ppcre:scan (car x) tile-string)
 		   collect x)))
 
-(defun tile-at (board-map x y)
+(defun tile-at (board-map x y &key raw)
   "From a board map, lookup tile at given coords and return parsed tile symbol."
   (if (array-in-bounds-p board-map y x)
-	  (parse-tile (aref board-map y x))))
+	  (let ((tile-string (aref board-map y x)))
+		(if raw
+			tile-string
+			(parse-tile tile-string)))))
 
 ;; NOTE: x and y swap places
 (defun my-location (game)
   "Get your hero's current location."
-  (let ((position (jsown:val (jsown:val game "hero") "pos")))
+  (let ((position (get-in game "hero" "pos")))
 	(list (jsown:val position "y") (jsown:val position "x"))))
 
 ;;; bot
